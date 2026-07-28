@@ -14,10 +14,12 @@ import androidx.compose.ui.unit.sp
 import com.zaddy.optix.auth.DeviceActivationScreen
 import com.zaddy.optix.auth.PinPadOverlay
 import com.zaddy.optix.catalog.ProductCatalogScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate()
+        super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
                 Surface(

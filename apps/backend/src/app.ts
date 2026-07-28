@@ -7,6 +7,8 @@ import { healthRoutes } from './observability/health/health.routes.js';
 import { authRoutes } from './api/v1/modules/auth/auth.routes.js';
 import { productRoutes } from './api/v1/modules/products/product.routes.js';
 import { billingRoutes } from './api/v1/modules/billing/billing.routes.js';
+import { customerRoutes } from './api/v1/modules/customers/customer.routes.js';
+import { shiftRoutes } from './api/v1/modules/shifts/shift.routes.js';
 
 export function buildApp() {
   const app = Fastify({
@@ -31,6 +33,8 @@ export function buildApp() {
   app.register(authRoutes);
   app.register(productRoutes);
   app.register(billingRoutes);
+  app.register(customerRoutes);
+  app.register(shiftRoutes);
 
   return app;
 }

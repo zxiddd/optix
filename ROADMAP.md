@@ -22,9 +22,9 @@ Single source of truth for engineering build progress and milestone deliverables
   - *Objective*: Cart computation (<50ms), split payment tenders, receipt printing, and RJ11 cash drawer solenoid pulse.
   - *Status*: COMPLETED
 
-- [ ] **Milestone 5: Shift Closing, RBAC & Customer CRM**
+- [x] **Milestone 5: Shift Closing, RBAC & Customer CRM**
   - *Objective*: Shift drawer float reconciliation Z-Reports, 7-role RBAC permissions, and customer Khata credit ledger.
-  - *Status*: PENDING
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 6: Specialized Vertical Domain Extensions**
   - *Objective*: Restaurant (KDS/Table split/merge), Chicken Shop (Scale/Yield loss), Medical (Generic salt/Expiry lock).

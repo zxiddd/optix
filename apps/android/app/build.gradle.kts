@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -25,12 +27,10 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            applicationIdSuffix = ".dev"
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000\"")
         }
         create("staging") {
             dimension = "environment"
-            applicationIdSuffix = ".staging"
             buildConfigField("String", "BASE_URL", "\"https://api.optixapp.in\"")
         }
         create("prod") {
@@ -41,7 +41,6 @@ android {
 
     buildTypes {
         debug {
-            isDebuggable = true
             isMinifyEnabled = false
         }
         release {
@@ -79,4 +78,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Hilt Dependency Injection
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-android-compiler:2.50")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 }
