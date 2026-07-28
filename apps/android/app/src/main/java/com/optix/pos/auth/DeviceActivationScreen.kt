@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -13,8 +14,11 @@ import androidx.compose.ui.unit.sp
 fun DeviceActivationScreen(
     onDeviceActivated: () -> Unit
 ) {
+    var email by remember { mutableStateOf("owner@metrocafe.com") }
+    var password by remember { mutableStateOf("") }
     var terminalName by remember { mutableStateOf("Counter POS 1") }
     var isRegistering by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -22,7 +26,7 @@ fun DeviceActivationScreen(
     ) {
         Card(
             modifier = Modifier
-                .width(400.dp)
+                .width(420.dp)
                 .padding(24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
@@ -31,17 +35,38 @@ fun DeviceActivationScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Optix POS Activation",
+                    text = "Optix Firebase Login",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Register this Android terminal to your store tenant.",
+                    text = "Sign in with your Firebase Email/Password account.",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Firebase Account Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = terminalName,
@@ -51,10 +76,19 @@ fun DeviceActivationScreen(
                     singleLine = true
                 )
 
+                errorMessage?.let {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
+                        if (email.isBlank() || password.isBlank()) {
+                            errorMessage = "Email and Password are required."
+                            return@Button
+                        }
                         isRegistering = true
                         onDeviceActivated()
                     },
@@ -68,7 +102,7 @@ fun DeviceActivationScreen(
                             modifier = Modifier.size(24.dp)
                         )
                     } else {
-                        Text(text = "ACTIVATE TERMINAL", fontWeight = FontWeight.Bold)
+                        Text(text = "SIGN IN & ACTIVATE TERMINAL", fontWeight = FontWeight.Bold)
                     }
                 }
             }

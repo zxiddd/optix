@@ -27,9 +27,13 @@ jobs:
         run: npm --workspace=packages/shared-types run build
 
       - name: Generate Prisma Client
+        env:
+          DATABASE_URL: "postgresql://optix_admin:pass@localhost:5432/optix_dev?schema=public"
         run: cd apps/backend && npx prisma generate
 
       - name: Validate Prisma Schema
+        env:
+          DATABASE_URL: "postgresql://optix_admin:pass@localhost:5432/optix_dev?schema=public"
         run: cd apps/backend && npx prisma validate
 
       - name: TypeScript Typecheck & Build
