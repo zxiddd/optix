@@ -47,6 +47,9 @@ COPY apps/backend/prisma ./apps/backend/prisma
 # Install production dependencies only
 RUN npm ci --only=production
 
+# Generate Prisma Client for runtime node_modules
+RUN cd apps/backend && npx prisma generate
+
 # Set ownership to non-root optix user
 RUN chown -R optixuser:optixgroup /app
 
