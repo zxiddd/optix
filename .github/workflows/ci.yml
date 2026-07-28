@@ -71,12 +71,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Verify Gradle Setup
         run: |
           cd apps/android
-          if [ -f "./gradlew" ]; then
-            chmod +x ./gradlew
-            ./gradlew --version
-          else
-            echo "Gradle wrapper missing"
-          fi
+          gradle --version
