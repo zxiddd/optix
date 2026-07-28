@@ -12,6 +12,8 @@ import { shiftRoutes } from './api/v1/modules/shifts/shift.routes.js';
 import { verticalRoutes } from './api/v1/modules/verticals/verticals.routes.js';
 import { syncRoutes } from './api/v1/modules/sync/sync.routes.js';
 import { reportsRoutes } from './api/v1/modules/reports/reports.routes.js';
+import { subscriptionRoutes } from './api/v1/modules/subscriptions/subscription.routes.js';
+import { adminRoutes } from './api/v1/modules/admin/admin.routes.js';
 
 export function buildApp() {
   const app = Fastify({
@@ -41,6 +43,8 @@ export function buildApp() {
   app.register(verticalRoutes);
   app.register(syncRoutes);
   app.register(reportsRoutes);
+  app.register(subscriptionRoutes);
+  app.register(adminRoutes);
 
   return app;
 }

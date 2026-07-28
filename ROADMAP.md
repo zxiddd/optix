@@ -38,9 +38,9 @@ Single source of truth for engineering build progress and milestone deliverables
   - *Objective*: Financial X/Z-Reports, GST/VAT tax registers, and executive BI analytics dashboards.
   - *Status*: COMPLETED
 
-- [ ] **Milestone 9: SaaS Subscriptions & Admin Web Portal**
+- [x] **Milestone 9: SaaS Subscriptions & Admin Web Portal**
   - *Objective*: Tiered plans, 7-day offline grace period, payment recovery, and Super Admin portal.
-  - *Status*: PENDING
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 10: Production Scale & Global Release**
   - *Objective*: Production VPS deployment, multi-outlet chain fleet management, and Play Store release.
