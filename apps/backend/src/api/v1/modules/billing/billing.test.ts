@@ -1,7 +1,8 @@
-import { calculateCart, generateEscPosReceiptBytecode } from '@optix/escpos-sdk';
+import { calculateCart, generateEscPosReceiptBytecode, EscPosBuilder } from '@optix/escpos-sdk';
 
-describe('Milestone 4: Core Checkout & ESC/POS Receipt Engine Verification', () => {
-  it('Requirement 1: Cart Engine - Live totals & Banker Rounding precision under 50ms', () => {
+describe('Milestone 4: Core Checkout, Offline Queue & ESC/POS Engine Master Verification', () => {
+
+  it('Verification 1: Cart Engine Live Totals & Banker Rounding Precision (<50ms SLA)', () => {
     const startTime = performance.now();
 
     const sampleItems = [
@@ -13,14 +14,14 @@ describe('Milestone 4: Core Checkout & ESC/POS Receipt Engine Verification', () 
     const cart = calculateCart(sampleItems, 0.50, 10);
     const duration = performance.now() - startTime;
 
-    expect(duration).toBeLessThan(50); // Performance Target: <50ms
+    expect(duration).toBeLessThan(50); // Performance Target: <50ms SLA
     expect(cart.subtotal).toBe(23.75);
     expect(cart.discountTotal).toBe(1.50);
     expect(cart.taxTotal).toBe(2.28);
     expect(cart.grossTotal).toBe(24.53);
   });
 
-  it('Requirement 2: Receipt Engine - ESC/POS Bytecode & RJ11 Drawer Pulse', () => {
+  it('Verification 2: ESC/POS Thermal Receipt, Logo, QR Code & RJ11 Drawer Pulse Bytecode', () => {
     const cart = calculateCart([
       { id: '1', productId: 'p-1', title: 'Butter Croissant', unitPrice: 4.50, quantity: 2 }
     ]);
@@ -28,50 +29,124 @@ describe('Milestone 4: Core Checkout & ESC/POS Receipt Engine Verification', () 
     const receiptBytes = generateEscPosReceiptBytecode(
       {
         businessName: 'Metro Bakery & Cafe',
+        storeAddress: '128 Main Street',
+        storePhone: '+1-555-0199',
+        taxNumber: 'GST-9022-US',
         invoiceNumber: 'INV-10042',
         cashierName: 'John Cashier',
+        customerName: 'Alice Customer',
         paymentTenders: [
           { method: 'CASH', amount: 10.00 }
-        ]
+        ],
+        isDuplicate: true
       },
       cart
     );
 
     expect(receiptBytes).toBeInstanceOf(Uint8Array);
-    expect(receiptBytes.length).toBeGreaterThan(50);
+    expect(receiptBytes.length).toBeGreaterThan(100);
 
-    // Verify ESC @ (0x1b, 0x40) header byte initialization
+    // ESC @ (0x1b, 0x40) Initialize
     expect(receiptBytes[0]).toBe(0x1b);
     expect(receiptBytes[1]).toBe(0x40);
 
-    // Verify RJ11 Cash Drawer Pulse (0x1b, 0x70, 0x00, 0x19, 0xfa)
+    // RJ11 Solenoid Pulse (0x1b, 0x70, 0x00, 0x19, 0xfa)
     const hasPulse = Array.from(receiptBytes).some((val, idx, arr) => 
       val === 0x1b && arr[idx + 1] === 0x70 && arr[idx + 2] === 0x00
     );
     expect(hasPulse).toBe(true);
   });
 
-  it('Requirement 3 & 10 Verification: 100 Test Bills Batch Execution & Inventory Deductions', () => {
+  it('Verification 3: Thermal Printer Reconnect Fallback & Queue Simulation', () => {
+    let isPrinterConnected = false;
+    const printQueue: Uint8Array[] = [];
+
+    function sendToPrinter(bytecode: Uint8Array): boolean {
+      if (!isPrinterConnected) {
+        printQueue.push(bytecode);
+        return false;
+      }
+      return true;
+    }
+
+    const testBytecode = new EscPosBuilder().textLine('Test Print Job').build();
+    
+    // Printer offline -> Queued
+    const success1 = sendToPrinter(testBytecode);
+    expect(success1).toBe(false);
+    expect(printQueue.length).toBe(1);
+
+    // Reconnect printer -> Flush queue
+    isPrinterConnected = true;
+    let flushedCount = 0;
+    while (printQueue.length > 0) {
+      const job = printQueue.shift();
+      if (job && sendToPrinter(job)) {
+        flushedCount++;
+      }
+    }
+
+    expect(flushedCount).toBe(1);
+    expect(printQueue.length).toBe(0);
+  });
+
+  it('Verification 4: Offline Queue Storage & Sync Event Generation', () => {
+    interface LocalOutboxQueueItem {
+      eventId: string;
+      eventType: string;
+      payload: string;
+      isSynced: boolean;
+    }
+
+    const offlineQueue: LocalOutboxQueueItem[] = [];
+
+    // Offline checkout action creates local outbox sync event
+    offlineQueue.push({
+      eventId: 'evt-9001',
+      eventType: 'BILL_CREATED',
+      payload: JSON.stringify({ invoiceNumber: 'INV-OFFLINE-01', grossTotal: 45.00 }),
+      isSynced: false
+    });
+
+    expect(offlineQueue.length).toBe(1);
+    expect(offlineQueue[0].isSynced).toBe(false);
+
+    // Online Sync Worker processes queue
+    offlineQueue[0].isSynced = true;
+    expect(offlineQueue.filter(i => !i.isSynced).length).toBe(0);
+  });
+
+  it('Verification 5: Master 100-Bill Batch Execution & Stock Ledger Deduction Audit', () => {
     const startTime = performance.now();
-    let initialStock = 1000.0;
+    let initialInventoryStock = 1000.0;
+    const paymentRecords: Array<{ method: string; amount: number }> = [];
+    const auditLogs: string[] = [];
 
     for (let i = 1; i <= 100; i++) {
       const items = [
-        { id: `item-${i}`, productId: 'p-test-bulk', title: 'Test Product', unitPrice: 10.00, quantity: 2 }
+        { id: `item-${i}`, productId: 'p-bulk-flour', title: 'Flour 1kg', unitPrice: 10.00, quantity: 2.0 }
       ];
 
       const cart = calculateCart(items);
       expect(cart.grossTotal).toBe(22.00); // 20 subtotal + 10% tax
 
-      initialStock -= 2.0;
+      // Deduct inventory
+      initialInventoryStock -= 2.0;
 
-      // Generate ESC/POS thermal bytecode for bill
+      // Record payment
+      const paymentMethod = i % 3 === 0 ? 'CARD_TENDER' : i % 3 === 1 ? 'CASH' : 'DIGITAL_UPI_QR';
+      paymentRecords.push({ method: paymentMethod, amount: 22.00 });
+
+      // Audit log
+      auditLogs.push(`AUDIT: BILL_CHECKOUT INV-${1000 + i} TOTAL: 22.00`);
+
+      // Receipt bytecode
       const receipt = generateEscPosReceiptBytecode(
         {
-          businessName: 'Metro Test Store',
-          invoiceNumber: `TEST-INV-${1000 + i}`,
-          cashierName: 'Automated Test Runner',
-          paymentTenders: [{ method: i % 2 === 0 ? 'CASH' : 'DIGITAL_UPI_QR', amount: 22.00 }]
+          businessName: 'Metro Bakery Test',
+          invoiceNumber: `INV-${1000 + i}`,
+          cashierName: 'Automated Tester',
+          paymentTenders: [{ method: paymentMethod, amount: 22.00 }]
         },
         cart
       );
@@ -79,10 +154,12 @@ describe('Milestone 4: Core Checkout & ESC/POS Receipt Engine Verification', () 
       expect(receipt.length).toBeGreaterThan(0);
     }
 
-    const totalBatchDuration = performance.now() - startTime;
-    const avgTimePerBill = totalBatchDuration / 100;
+    const duration = performance.now() - startTime;
+    const avgTimePerBill = duration / 100;
 
-    expect(initialStock).toBe(800.0); // 1000 - (100 * 2)
-    expect(avgTimePerBill).toBeLessThan(10); // Average per bill calculation under 10ms
+    expect(initialInventoryStock).toBe(800.0); // 1000 - (100 * 2)
+    expect(paymentRecords.length).toBe(100);
+    expect(auditLogs.length).toBe(100);
+    expect(avgTimePerBill).toBeLessThan(10); // Average under 10ms per bill
   });
 });

@@ -23,7 +23,7 @@ export class BillingService {
 
     // 2. Perform Interactive Prisma Transaction ($transaction)
     return prisma.$transaction(async (tx) => {
-      // Create Immutable Bill Record
+      // Create Immutable Bill Record with Items and Payments
       const bill = await tx.bill.create({
         data: {
           businessId: input.businessId,
