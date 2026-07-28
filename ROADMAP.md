@@ -30,9 +30,9 @@ Single source of truth for engineering build progress and milestone deliverables
   - *Objective*: Restaurant (KDS/Table split/merge), Chicken Shop (Scale/Yield loss), Medical (Generic salt/Expiry lock).
   - *Status*: COMPLETED
 
-- [ ] **Milestone 7: Room Outbox Queue & Offline Sync Engine**
+- [x] **Milestone 7: Room Outbox Queue & Offline Sync Engine**
   - *Objective*: Room outbox event queue, WorkManager push worker, and central conflict resolution.
-  - *Status*: PENDING
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 8: Reports, Analytics & Financial Registers**
   - *Objective*: Financial X/Z-Reports, GST/VAT tax registers, and executive BI analytics dashboards.
