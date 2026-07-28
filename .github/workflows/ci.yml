@@ -1,0 +1,74 @@
+name: Optix Continuous Integration Pipeline
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ develop ]
+
+jobs:
+  lint-build-test-backend:
+    name: Backend CI (Build, Lint, Unit Test, Prisma)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: npm ci
+
+      - name: Build Shared Types Package
+        run: npm --workspace=packages/shared-types run build
+
+      - name: Generate Prisma Client
+        run: cd apps/backend && npx prisma generate
+
+      - name: Validate Prisma Schema
+        run: cd apps/backend && npx prisma validate
+
+      - name: TypeScript Typecheck & Build
+        run: npm --workspace=apps/backend run build
+
+      - name: Run Backend Unit Tests
+        run: npm --workspace=apps/backend run test
+
+  verify-docker-build:
+    name: Verify Multi-Stage Dockerfile Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Docker Image Test
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: false
+          tags: optix-backend:ci-test
+
+  verify-android-build:
+    name: Verify Android Gradle Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x apps/android/gradlew || true
+
+      - name: Verify Gradle Setup
+        run: cd apps/android && ./gradlew --version

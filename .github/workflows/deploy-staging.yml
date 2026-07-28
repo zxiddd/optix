@@ -1,0 +1,56 @@
+name: Deploy Staging to VPS
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build-and-deploy-staging:
+    name: Build Docker Image & Deploy to Staging VPS (200.141.7.8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker Image to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/backend:staging
+            ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+
+      - name: Deploy to VPS Staging (200.141.7.8) via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ""
+          script: |
+            echo "=== Logging into GHCR on VPS ==="
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "=== Pulling Latest Staging Image ==="
+            docker pull ghcr.io/${{ github.repository }}/backend:staging
+
+            echo "=== Deploying Staging Docker Compose ==="
+            cd /opt/optix
+            docker compose -f infra/docker/docker-compose.staging.yml up -d --remove-orphans
+
+            echo "=== Executing Health Check Probe ==="
+            chmod +x scripts/healthcheck.sh
+            ./scripts/healthcheck.sh http://localhost:3000/health

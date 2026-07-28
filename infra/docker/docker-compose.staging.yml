@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  backend-staging:
+    image: ghcr.io/zxiddd/optix/backend:staging
+    container_name: optix-backend-staging
+    restart: always
+    environment:
+      - NODE_ENV=staging
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DATABASE_URL=${STAGING_DATABASE_URL}
+      - REDIS_URL=${STAGING_REDIS_URL}
+      - JWT_SECRET=${STAGING_JWT_SECRET}
+      - FIREBASE_PROJECT_ID=${STAGING_FIREBASE_PROJECT_ID}
+      - FIREBASE_CLIENT_EMAIL=${STAGING_FIREBASE_CLIENT_EMAIL}
+      - FIREBASE_PRIVATE_KEY=${STAGING_FIREBASE_PRIVATE_KEY}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    networks:
+      - optix-staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  postgres-staging:
+    image: postgres:16-alpine
+    container_name: optix-postgres-staging
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-optix_staging_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-optix_staging_pass_9022}
+      POSTGRES_DB: ${POSTGRES_DB:-optix_staging_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - optix_postgres_staging_data:/var/lib/postgresql/data
+    networks:
+      - optix-staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-optix_staging_admin} -d ${POSTGRES_DB:-optix_staging_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-staging:
+    image: redis:7.2-alpine
+    container_name: optix-redis-staging
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - optix_redis_staging_data:/data
+    networks:
+      - optix-staging-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  optix-staging-network:
+    driver: bridge
+
+volumes:
+  optix_postgres_staging_data:
+  optix_redis_staging_data:

@@ -20,7 +20,29 @@ android {
         }
     }
 
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000\"")
+        }
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            buildConfigField("String", "BASE_URL", "\"http://200.141.7.8:3000\"")
+        }
+        create("prod") {
+            dimension = "environment"
+            buildConfigField("String", "BASE_URL", "\"https://api.optixpos.com\"")
+        }
+    }
+
     buildTypes {
+        debug {
+            isDebuggable = true
+            isMinifyEnabled = false
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -35,6 +57,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"

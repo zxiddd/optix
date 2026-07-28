@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  backend-prod-1:
+    image: ghcr.io/zxiddd/optix/backend:latest
+    container_name: optix-backend-prod-1
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres-prod:
+        condition: service_healthy
+      redis-prod:
+        condition: service_healthy
+    networks:
+      - optix-prod-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  backend-prod-2:
+    image: ghcr.io/zxiddd/optix/backend:latest
+    container_name: optix-backend-prod-2
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres-prod:
+        condition: service_healthy
+      redis-prod:
+        condition: service_healthy
+    networks:
+      - optix-prod-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  postgres-prod:
+    image: postgres:16-alpine
+    container_name: optix-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - optix_postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - optix-prod-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-prod:
+    image: redis:7.2-alpine
+    container_name: optix-redis-prod
+    restart: always
+    volumes:
+      - optix_redis_prod_data:/data
+    networks:
+      - optix-prod-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  optix-prod-network:
+    driver: bridge
+
+volumes:
+  optix_postgres_prod_data:
+  optix_redis_prod_data:

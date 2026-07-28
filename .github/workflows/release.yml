@@ -1,0 +1,25 @@
+name: Release Tagging & Production Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-github-release:
+    name: Create SemVer Tag Release & Publish Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Shared Types Package
+        run: |
+          npm ci
+          npm --workspace=packages/shared-types run build
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
