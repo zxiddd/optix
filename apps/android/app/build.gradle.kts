@@ -30,7 +30,7 @@ android {
         create("staging") {
             dimension = "environment"
             applicationIdSuffix = ".staging"
-            buildConfigField("String", "BASE_URL", "\"http://200.141.7.8:3000\"")
+            buildConfigField("String", "BASE_URL", "\"http://200.141.7.8\"")
         }
         create("prod") {
             dimension = "environment"

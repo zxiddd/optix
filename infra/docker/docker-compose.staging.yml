@@ -16,7 +16,7 @@ services:
       - FIREBASE_CLIENT_EMAIL=${STAGING_FIREBASE_CLIENT_EMAIL}
       - FIREBASE_PRIVATE_KEY=${STAGING_FIREBASE_PRIVATE_KEY}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       postgres-staging:
         condition: service_healthy
@@ -40,7 +40,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-optix_staging_pass_9022}
       POSTGRES_DB: ${POSTGRES_DB:-optix_staging_db}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - optix_postgres_staging_data:/var/lib/postgresql/data
     networks:
@@ -56,7 +56,7 @@ services:
     container_name: optix-redis-staging
     restart: always
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - optix_redis_staging_data:/data
     networks:
