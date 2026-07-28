@@ -8,11 +8,11 @@ Single source of truth for engineering build progress and milestone deliverables
 
 - [x] **Milestone 1: Repository Bootstrap & Foundation Core**
   - *Objective*: A developer can clone the repository, run one command, and have the backend and Android app compiling successfully.
-  - *Status*: COMPLETED (v1.0 Baseline Built)
+  - *Status*: COMPLETED (v1.0 Baseline Built & Pushed to GitHub)
 
-- [ ] **Milestone 2: Authentication & Business Tenant Context**
-  - *Objective*: Firebase JWT auth, staff PIN overlay, multi-tenant `business_id` scoping, and device onboarding hydration (`POST /auth/device-register`).
-  - *Status*: PENDING
+- [x] **Milestone 2: Authentication & Business Tenant Context**
+  - *Objective*: Firebase JWT auth, staff PIN security overlay, multi-tenant `business_id` scoping middleware, and device onboarding hydration (`POST /auth/device-register`).
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 3: Product Catalog & Pricing Engine**
   - *Objective*: Catalog management, categories, search, and pricing strategies (`FIXED`, `WEIGHT`, `VARIABLE`, `MARKET`).
