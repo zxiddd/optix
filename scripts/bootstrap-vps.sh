@@ -1,7 +1,5 @@
 #!/bin/bash
-# Master VPS Automated Provisioning Script for Optix POS (Ubuntu 24.04 LTS)
-# Run as root or with sudo
-
+# Master VPS Automated Provisioning Script for Optix POS (Ubuntu 24.04 LTS) - Idempotent
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -11,17 +9,20 @@ echo "      OPTIX POS VPS AUTOMATED PROVISIONING BOOTSTRAP       "
 echo "=========================================================="
 
 echo "[1/8] Updating System Packages & Configuring Swap..."
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl git ufw fail2ban ca-certificates software-properties-common
+sudo apt update -y
 
-# Create 2GB Swap file if not existing
+# Create 2GB Swap file idempotently
 if [ ! -f /swapfile ]; then
     echo "Creating 2GB swap file..."
     sudo fallocate -l 2G /swapfile
     sudo chmod 600 /swapfile
     sudo mkswap /swapfile
     sudo swapon /swapfile
-    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    if ! grep -q '/swapfile' /etc/fstab; then
+        echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    fi
+else
+    echo "Swap file /swapfile already exists. Skipping."
 fi
 
 echo "[2/8] Running User & Permission Setup..."

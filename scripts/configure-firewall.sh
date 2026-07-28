@@ -1,6 +1,12 @@
 #!/bin/bash
-# Configure UFW Firewall & Fail2Ban Protection
+# Configure UFW Firewall & Fail2Ban Protection - Idempotent
 set -e
+
+if ! command -v ufw >/dev/null 2>&1 || ! command -v fail2ban-client >/dev/null 2>&1; then
+    echo "=== Installing UFW & Fail2Ban ==="
+    sudo apt update
+    sudo apt install -y ufw fail2ban
+fi
 
 echo "=== Configuring UFW Firewall Rules ==="
 sudo ufw default deny incoming
