@@ -4,10 +4,17 @@ on:
   push:
     branches: [ develop ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-deploy-staging:
     name: Build Docker Image & Deploy to Staging VPS (api.optixapp.in)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
