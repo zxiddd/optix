@@ -36,12 +36,12 @@ ENV HOST=0.0.0.0
 RUN addgroup -g 1001 -S optixgroup && \
     adduser -u 1001 -S optixuser -G optixgroup
 
-# Copy built dist files & package definitions
+# Copy built dist files & package definitions from Stage 1 (builder)
 COPY package.json package-lock.json ./
 COPY packages/shared-types/package.json ./packages/shared-types/
-COPY packages/shared-types/dist ./packages/shared-types/dist
+COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
 COPY apps/backend/package.json ./apps/backend/
-COPY apps/backend/dist ./apps/backend/dist
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
 COPY apps/backend/prisma ./apps/backend/prisma
 
 # Install production dependencies only
