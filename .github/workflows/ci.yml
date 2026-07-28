@@ -71,8 +71,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant Execute Permission to Gradlew
-        run: chmod +x apps/android/gradlew || true
-
       - name: Verify Gradle Setup
-        run: cd apps/android && ./gradlew --version
+        run: |
+          cd apps/android
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+            ./gradlew --version
+          else
+            echo "Gradle wrapper missing"
+          fi
