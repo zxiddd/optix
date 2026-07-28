@@ -23,8 +23,8 @@ jobs:
       - name: Install Monorepo Dependencies
         run: npm ci
 
-      - name: Build Shared Types Package
-        run: npm --workspace=packages/shared-types run build
+      - name: Build Shared Packages
+        run: npm run build:packages
 
       - name: Generate Prisma Client
         env:

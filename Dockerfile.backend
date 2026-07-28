@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy monorepo configuration files
 COPY package.json package-lock.json ./
 COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/escpos-sdk/package.json ./packages/escpos-sdk/
 COPY apps/backend/package.json ./apps/backend/
 
 # Install all dependencies including devDependencies
@@ -14,10 +15,12 @@ RUN npm ci
 
 # Copy source files
 COPY packages/shared-types ./packages/shared-types
+COPY packages/escpos-sdk ./packages/escpos-sdk
 COPY apps/backend ./apps/backend
 
-# Build shared types & backend TypeScript
+# Build shared types, escpos-sdk & backend TypeScript
 RUN npm --workspace=packages/shared-types run build
+RUN npm --workspace=packages/escpos-sdk run build
 RUN npm --workspace=apps/backend run build
 
 # Generate Prisma Client
@@ -40,6 +43,8 @@ RUN addgroup -g 1001 -S optixgroup && \
 COPY package.json package-lock.json ./
 COPY packages/shared-types/package.json ./packages/shared-types/
 COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
+COPY packages/escpos-sdk/package.json ./packages/escpos-sdk/
+COPY --from=builder /app/packages/escpos-sdk/dist ./packages/escpos-sdk/dist
 COPY apps/backend/package.json ./apps/backend/
 COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
 COPY apps/backend/prisma ./apps/backend/prisma

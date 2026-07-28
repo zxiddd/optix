@@ -18,9 +18,9 @@ Single source of truth for engineering build progress and milestone deliverables
   - *Objective*: Catalog management, categories, search, and pricing strategies (`FIXED`, `WEIGHT`, `VARIABLE`, `MARKET`).
   - *Status*: COMPLETED
 
-- [ ] **Milestone 4: Register Billing & ESC/POS Thermal Printing**
+- [x] **Milestone 4: Register Billing & ESC/POS Thermal Printing**
   - *Objective*: Cart computation (<50ms), split payment tenders, receipt printing, and RJ11 cash drawer solenoid pulse.
-  - *Status*: PENDING
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 5: Shift Closing, RBAC & Customer CRM**
   - *Objective*: Shift drawer float reconciliation Z-Reports, 7-role RBAC permissions, and customer Khata credit ledger.
