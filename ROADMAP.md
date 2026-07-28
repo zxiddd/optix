@@ -14,9 +14,9 @@ Single source of truth for engineering build progress and milestone deliverables
   - *Objective*: Firebase JWT auth, staff PIN security overlay, multi-tenant `business_id` scoping middleware, and device onboarding hydration (`POST /auth/device-register`).
   - *Status*: COMPLETED
 
-- [ ] **Milestone 3: Product Catalog & Pricing Engine**
+- [x] **Milestone 3: Product Catalog & Pricing Engine**
   - *Objective*: Catalog management, categories, search, and pricing strategies (`FIXED`, `WEIGHT`, `VARIABLE`, `MARKET`).
-  - *Status*: PENDING
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 4: Register Billing & ESC/POS Thermal Printing**
   - *Objective*: Cart computation (<50ms), split payment tenders, receipt printing, and RJ11 cash drawer solenoid pulse.

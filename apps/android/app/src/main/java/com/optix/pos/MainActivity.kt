@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaddy.optix.auth.DeviceActivationScreen
 import com.zaddy.optix.auth.PinPadOverlay
+import com.zaddy.optix.catalog.ProductCatalogScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,23 +59,42 @@ fun OptixMainAppNavigation() {
 @Composable
 fun OptixRegisterMainScreen(onLockTerminal: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Optix POS Register Active",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Tenant: Metro Bakery & Cafe | User: Cashier John")
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = onLockTerminal) {
-            Text(text = "LOCK TERMINAL (PIN OVERLAY)")
+        // POS Header Bar
+        Surface(
+            color = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Metro Bakery & Cafe",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                    Text(
+                        text = "Terminal: Counter POS 1 | Cashier: John",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Button(
+                    onClick = onLockTerminal,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("LOCK TERMINAL")
+                }
+            }
         }
+
+        // Main Catalog Screen Layout
+        ProductCatalogScreen()
     }
 }

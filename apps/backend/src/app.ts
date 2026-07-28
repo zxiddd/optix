@@ -5,6 +5,7 @@ import rateLimit from '@fastify/rate-limit';
 import { logger } from './observability/logging/logger.js';
 import { healthRoutes } from './observability/health/health.routes.js';
 import { authRoutes } from './api/v1/modules/auth/auth.routes.js';
+import { productRoutes } from './api/v1/modules/products/product.routes.js';
 
 export function buildApp() {
   const app = Fastify({
@@ -27,6 +28,7 @@ export function buildApp() {
   // Register Domain Route Modules
   app.register(healthRoutes);
   app.register(authRoutes);
+  app.register(productRoutes);
 
   return app;
 }
