@@ -26,9 +26,9 @@ Single source of truth for engineering build progress and milestone deliverables
   - *Objective*: Shift drawer float reconciliation Z-Reports, 7-role RBAC permissions, and customer Khata credit ledger.
   - *Status*: COMPLETED
 
-- [ ] **Milestone 6: Specialized Vertical Domain Extensions**
+- [x] **Milestone 6: Specialized Vertical Domain Extensions**
   - *Objective*: Restaurant (KDS/Table split/merge), Chicken Shop (Scale/Yield loss), Medical (Generic salt/Expiry lock).
-  - *Status*: PENDING
+  - *Status*: COMPLETED
 
 - [ ] **Milestone 7: Room Outbox Queue & Offline Sync Engine**
   - *Objective*: Room outbox event queue, WorkManager push worker, and central conflict resolution.
