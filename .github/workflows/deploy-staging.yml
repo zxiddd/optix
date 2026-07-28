@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy-staging:
-    name: Build Docker Image & Deploy to Staging VPS (200.141.7.8)
+    name: Build Docker Image & Deploy to Staging VPS (api.optixapp.in)
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +32,7 @@ jobs:
             ghcr.io/${{ github.repository }}/backend:staging
             ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
 
-      - name: Deploy to VPS Staging (200.141.7.8) via SSH Password
+      - name: Deploy to VPS Staging (api.optixapp.in) via SSH Password
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}

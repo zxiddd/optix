@@ -1,7 +1,7 @@
 # 10 - GitHub Secrets & Environment Variables Security Guide
 
 ## Purpose
-This document defines every GitHub Action Secret, environment variable, and credential requirement for configuring the automated CI/CD deployment pipeline for **Optix POS**.
+This document defines every GitHub Action Secret, environment variable, and credential requirement for configuring the automated CI/CD deployment pipeline for **Optix POS** (`api.optixapp.in`).
 
 ---
 
@@ -11,7 +11,7 @@ Configure the following secrets in your GitHub repository under **Settings > Sec
 
 | Secret Name | Description | Value for Your Setup |
 | :--- | :--- | :--- |
-| `VPS_HOST` | Target Ubuntu 24.04 LTS VPS IP Address | `200.141.7.8` |
+| `VPS_HOST` | Target VPS Domain or IP Address | `api.optixapp.in` |
 | `VPS_USER` | Deployment SSH User | `root` |
 | `VPS_PASSWORD` | VPS SSH Authentication Password | `Zaiduddin@787` |
 | `STAGING_DATABASE_URL` | Staging PostgreSQL connection string | `postgresql://optix_staging_admin:pass@localhost:5432/optix_staging_db` |
@@ -29,7 +29,7 @@ Configure the following secrets in your GitHub repository under **Settings > Sec
 ## How to Setup Secrets via GitHub CLI (`gh`)
 
 ```bash
-gh secret set VPS_HOST --body "200.141.7.8"
+gh secret set VPS_HOST --body "api.optixapp.in"
 gh secret set VPS_USER --body "root"
 gh secret set VPS_PASSWORD --body "Zaiduddin@787"
 ```
