@@ -1,0 +1,38 @@
+# Node & Monorepo Dependencies
+node_modules/
+.pnpm-store/
+dist/
+build/
+.cache/
+*.log
+
+# Environment Files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Android Dependencies & Builds
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/.externalNativeBuild/
+android/.cxx/
+android/local.properties
+*.apk
+*.aab
+
+# IDE & System Files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Database & Testing Artifacts
+coverage/
+.prisma/
+*.sql.gz

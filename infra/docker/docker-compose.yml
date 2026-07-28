@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: optix-postgres-local
+    restart: always
+    environment:
+      POSTGRES_USER: optix_admin
+      POSTGRES_PASSWORD: optix_pass_local
+      POSTGRES_DB: optix_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - optix_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U optix_admin -d optix_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: optix-redis-local
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - optix_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  optix_postgres_data:
+  optix_redis_data:
