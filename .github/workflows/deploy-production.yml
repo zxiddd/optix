@@ -44,5 +44,8 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /opt/optix
-            chmod +x scripts/deploy.sh
+            git config --global --add safe.directory /opt/optix || true
+            git checkout . || true
+            git pull origin main
+            chmod +x scripts/*.sh
             ./scripts/deploy.sh ghcr.io/${{ github.repository }}/backend:latest

@@ -46,16 +46,9 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            echo "=== Logging into GHCR on VPS ==="
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            echo "=== Pulling Latest Staging Image ==="
-            docker pull ghcr.io/${{ github.repository }}/backend:staging
-
-            echo "=== Deploying Staging Docker Compose ==="
             cd /opt/optix
-            docker compose -f infra/docker/docker-compose.staging.yml up -d --remove-orphans
-
-            echo "=== Executing Health Check Probe ==="
-            chmod +x scripts/healthcheck.sh
-            ./scripts/healthcheck.sh http://localhost:3000/health
+            git config --global --add safe.directory /opt/optix || true
+            git checkout . || true
+            git pull origin develop || git pull origin main
+            chmod +x scripts/*.sh
+            ./scripts/deploy.sh ghcr.io/${{ github.repository }}/backend:staging
