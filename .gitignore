@@ -1,38 +1,61 @@
-# Node & Monorepo Dependencies
+# Monorepo Dependency Directories
 node_modules/
 .pnpm-store/
+
+# Compiled Production Outputs & Distributables
 dist/
 build/
-.cache/
-*.log
+out/
+*.tsbuildinfo
 
-# Environment Files
+# Environmental Files & Secrets
 .env
 .env.local
-.env.production
-.env.staging
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Android Dependencies & Builds
-android/.gradle/
-android/app/build/
-android/build/
-android/captures/
-android/.externalNativeBuild/
-android/.cxx/
-android/local.properties
-*.apk
-*.aab
-
-# IDE & System Files
+# IDE & Editor Configuration
 .idea/
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/extensions.json
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# OS System Junk Files
 .DS_Store
 Thumbs.db
+ehthumbs.db
 
-# Database & Testing Artifacts
+# Android Build & Gradle Artifacts
+.gradle/
+apps/android/app/build/
+apps/android/.gradle/
+apps/android/build/
+apps/android/local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Docker Persistent Volumes Data
+.docker-data/
+postgres-data/
+redis-data/
+
+# Testing & Coverage Reports
 coverage/
-.prisma/
-*.sql.gz
+.nyc_output/
+*.lcov
+
+# Temporary & Log Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled TypeScript outputs in src directories
+packages/*/src/*.js
+packages/*/src/*.d.ts
+packages/*/src/*.js.map
