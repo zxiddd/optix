@@ -1,4 +1,4 @@
-package com.optix.pos.auth
+package com.zaddy.optix.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

@@ -1,4 +1,4 @@
-package com.optix.pos
+package com.zaddy.optix
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.optix.pos.auth.DeviceActivationScreen
-import com.optix.pos.auth.PinPadOverlay
+import com.zaddy.optix.auth.DeviceActivationScreen
+import com.zaddy.optix.auth.PinPadOverlay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

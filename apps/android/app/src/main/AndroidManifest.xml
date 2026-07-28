@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
     <application
-        android:name=".OptixApp"
+        android:name="com.zaddy.optix.OptixApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="Optix POS"
@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
-            android:name=".MainActivity"
+            android:name="com.zaddy.optix.MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:windowSoftInputMode="adjustResize">

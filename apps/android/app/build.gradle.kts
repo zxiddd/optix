@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.optix.pos"
+    namespace = "com.zaddy.optix"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.optix.pos"
+        applicationId = "com.zaddy.optix"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

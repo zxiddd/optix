@@ -1,45 +1,36 @@
 {
   "project_info": {
     "project_number": "460669951406",
-    "project_id": "optix-pos-460669951406",
-    "storage_bucket": "optix-pos-460669951406.appspot.com"
+    "project_id": "optix-13d16",
+    "storage_bucket": "optix-13d16.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:460669951406:android:89a42f531a84e12a720000",
+        "mobilesdk_app_id": "1:460669951406:android:d404978adb4bdc5ee37c3f",
         "android_client_info": {
-          "package_name": "com.optix.pos"
+          "package_name": "com.zaddy.optix"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "460669951406-6fgqi5nge9sulvvtei6ierskmjpg4gn8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyOptixPosFirebaseApiKeyPlaceholder460669951406"
+          "current_key": "AIzaSyD1teJb5G9bfCA49Z7t8Nzfe5YNy_qCIIk"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:460669951406:android:89a42f531a84e12a720001",
-        "android_client_info": {
-          "package_name": "com.optix.pos.dev"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyOptixPosFirebaseApiKeyPlaceholder460669951406"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "460669951406-6fgqi5nge9sulvvtei6ierskmjpg4gn8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -1,4 +1,4 @@
-package com.optix.pos.auth
+package com.zaddy.optix.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,7 +21,6 @@ fun PinPadOverlay(
     var enteredPin by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     
-    // Keypad numbers
     val keys = remember { listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "OK") }
 
     Box(
@@ -48,7 +47,6 @@ fun PinPadOverlay(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // PIN Dots
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -72,7 +70,6 @@ fun PinPadOverlay(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Numeric Keypad Grid
                 val chunkedKeys = keys.chunked(3)
                 chunkedKeys.forEach { rowKeys ->
                     Row(
