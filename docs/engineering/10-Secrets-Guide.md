@@ -9,12 +9,11 @@ This document defines every GitHub Action Secret, environment variable, and cred
 
 Configure the following secrets in your GitHub repository under **Settings > Secrets and variables > Actions**:
 
-| Secret Name | Description | Staging Value / Example |
+| Secret Name | Description | Value for Your Setup |
 | :--- | :--- | :--- |
 | `VPS_HOST` | Target Ubuntu 24.04 LTS VPS IP Address | `200.141.7.8` |
-| `VPS_USER` | Deployment SSH User | `root` or `optix` |
+| `VPS_USER` | Deployment SSH User | `root` |
 | `VPS_PASSWORD` | VPS SSH Authentication Password | `Zaiduddin@787` |
-| `VPS_SSH_KEY` | Private SSH Key for Passwordless Auth | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 | `STAGING_DATABASE_URL` | Staging PostgreSQL connection string | `postgresql://optix_staging_admin:pass@localhost:5432/optix_staging_db` |
 | `STAGING_REDIS_URL` | Staging Redis connection string | `redis://localhost:6379` |
 | `STAGING_JWT_SECRET` | 32-byte secret key for signing staging JWTs | `optix_staging_jwt_secret_9022_key_32bytes` |
