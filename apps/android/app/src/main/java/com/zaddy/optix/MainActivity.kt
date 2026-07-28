@@ -3,17 +3,16 @@ package com.zaddy.optix
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zaddy.optix.auth.DeviceActivationScreen
 import com.zaddy.optix.auth.PinPadOverlay
-import com.zaddy.optix.catalog.ProductCatalogScreen
+import com.zaddy.optix.ui.components.*
+import com.zaddy.optix.ui.screens.*
+import com.zaddy.optix.ui.theme.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,10 +20,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            OptixTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = OptixDarkBackground
                 ) {
                     OptixMainAppNavigation()
                 }
@@ -35,8 +34,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun OptixMainAppNavigation() {
-    var isDeviceActivated by remember { mutableStateOf(false) }
-    var isStaffAuthenticated by remember { mutableStateOf(false) }
+    var isDeviceActivated by remember { mutableStateOf(true) }
+    var isStaffAuthenticated by remember { mutableStateOf(true) }
 
     when {
         !isDeviceActivated -> {
@@ -51,7 +50,7 @@ fun OptixMainAppNavigation() {
             )
         }
         else -> {
-            OptixRegisterMainScreen(
+            OptixMainRegisterShell(
                 onLockTerminal = { isStaffAuthenticated = false }
             )
         }
@@ -59,44 +58,37 @@ fun OptixMainAppNavigation() {
 }
 
 @Composable
-fun OptixRegisterMainScreen(onLockTerminal: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // POS Header Bar
-        Surface(
-            color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "Metro Bakery & Cafe",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = "Terminal: Counter POS 1 | Cashier: John",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+fun OptixMainRegisterShell(onLockTerminal: () -> Unit) {
+    var selectedTab by remember { mutableStateOf(OptixNavTab.BILLING) }
 
-                Button(
-                    onClick = onLockTerminal,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("LOCK TERMINAL")
-                }
+    Scaffold(
+        topBar = {
+            OptixTopAppBar(
+                terminalName = "Counter POS 1",
+                cashierName = "John",
+                onLockTerminal = onLockTerminal
+            )
+        },
+        bottomBar = {
+            OptixBottomNavigation(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
+            )
+        },
+        containerColor = OptixDarkBackground
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when (selectedTab) {
+                OptixNavTab.BILLING -> BillingScreen()
+                OptixNavTab.HISTORY -> HistoryScreen()
+                OptixNavTab.MENU -> MenuCatalogScreen()
+                OptixNavTab.STATS -> StatsAnalyticsScreen()
+                OptixNavTab.SETTINGS -> SettingsScreen()
             }
         }
-
-        // Main Catalog Screen Layout
-        ProductCatalogScreen()
     }
 }

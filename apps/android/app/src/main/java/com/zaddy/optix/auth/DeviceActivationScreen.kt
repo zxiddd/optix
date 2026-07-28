@@ -1,14 +1,23 @@
 package com.zaddy.optix.auth
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zaddy.optix.ui.components.*
+import com.zaddy.optix.ui.theme.*
 
 @Composable
 fun DeviceActivationScreen(
@@ -21,38 +30,63 @@ fun DeviceActivationScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(OptixDarkBackground),
         contentAlignment = Alignment.Center
     ) {
-        Card(
+        OptixCard(
             modifier = Modifier
                 .width(420.dp)
-                .padding(24.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                .padding(24.dp)
         ) {
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(OptixOrangeSubtle),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PointOfSale,
+                        contentDescription = null,
+                        tint = OptixOrange,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = "Optix Firebase Login",
-                    fontSize = 24.sp,
+                    text = "OPTIX BILLING",
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = OptixTextPrimary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sign in with your Firebase Email/Password account.",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "Sign in to activate this register terminal.",
+                    color = OptixTextSecondary,
+                    fontSize = 13.sp
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Firebase Account Email") },
+                    label = { Text("Account Email", color = OptixTextSecondary) },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = OptixOrange,
+                        unfocusedBorderColor = OptixCardBorder,
+                        focusedTextColor = OptixTextPrimary,
+                        unfocusedTextColor = OptixTextPrimary
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -60,10 +94,16 @@ fun DeviceActivationScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text("Password", color = OptixTextSecondary) },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = OptixOrange,
+                        unfocusedBorderColor = OptixCardBorder,
+                        focusedTextColor = OptixTextPrimary,
+                        unfocusedTextColor = OptixTextPrimary
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -71,40 +111,35 @@ fun DeviceActivationScreen(
                 OutlinedTextField(
                     value = terminalName,
                     onValueChange = { terminalName = it },
-                    label = { Text("Terminal Display Name") },
+                    label = { Text("Terminal Name", color = OptixTextSecondary) },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = OptixOrange,
+                        unfocusedBorderColor = OptixCardBorder,
+                        focusedTextColor = OptixTextPrimary,
+                        unfocusedTextColor = OptixTextPrimary
+                    )
                 )
 
                 errorMessage?.let {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                    Text(text = it, color = OptixErrorRed, fontSize = 12.sp)
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Button(
+                OptixButton(
+                    text = if (isRegistering) "ACTIVATING TERMINAL..." else "ACTIVATE REGISTER",
                     onClick = {
                         if (email.isBlank() || password.isBlank()) {
                             errorMessage = "Email and Password are required."
-                            return@Button
+                            return@OptixButton
                         }
                         isRegistering = true
                         onDeviceActivated()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    if (isRegistering) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    } else {
-                        Text(text = "SIGN IN & ACTIVATE TERMINAL", fontWeight = FontWeight.Bold)
                     }
-                }
+                )
             }
         }
     }
