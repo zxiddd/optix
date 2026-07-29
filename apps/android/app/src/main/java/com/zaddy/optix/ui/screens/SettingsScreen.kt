@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.zaddy.optix.ui.components.*
 import com.zaddy.optix.ui.theme.*
 
-data class SettingTileItem(
+data class SettingSectionRow(
     val title: String,
     val subtitle: String,
     val icon: ImageVector
@@ -27,14 +27,19 @@ data class SettingTileItem(
 
 @Composable
 fun SettingsScreen() {
-    val settingsTiles = listOf(
-        SettingTileItem("Terminal Configuration", "Counter POS 1 • Multi-tenant Outlet #9022", Icons.Default.PointOfSale),
-        SettingTileItem("ESC/POS Thermal Printers", "Network TCP 192.168.1.100 • Cash Drawer Solenoid", Icons.Default.Print),
-        SettingTileItem("Payment Gateways & UPI", "Static UPI QR Code • PineLabs Card Terminal", Icons.Default.QrCodeScanner),
-        SettingTileItem("Tax & Charge Rates", "GST 10.0% • Service Tax Excluded", Icons.Default.Receipt),
-        SettingTileItem("Staff RBAC Permissions", "7 Active Roles • Security PIN Pad Overlay", Icons.Default.People),
-        SettingTileItem("Cloud Sync & Outbox Queue", "WorkManager Background Push • LWW Conflict Resolver", Icons.Default.CloudSync),
-        SettingTileItem("SaaS Subscription Status", "PRO POS Tier • 7-Day Offline Grace Active", Icons.Default.WorkspacePremium)
+    val settingsRows = listOf(
+        SettingSectionRow("Business Information", "Metro Cafe & Bakery • Outlet #9022", Icons.Default.Store),
+        SettingSectionRow("Payment Accounts & Tender", "Static UPI QR Code • PineLabs Card Terminal", Icons.Default.QrCodeScanner),
+        SettingSectionRow("Subscription & Licensing", "PRO POS Tier • 7-Day Offline Grace Active", Icons.Default.WorkspacePremium),
+        SettingSectionRow("Receipt Header & Footer", "Thermal Paper Preview • Custom Business Logo", Icons.Default.ReceiptLong),
+        SettingSectionRow("Staff & RBAC Permissions", "7 Active Staff Roles • Manager Security PIN", Icons.Default.People),
+        SettingSectionRow("ESC/POS Thermal Printers", "Network TCP 192.168.1.100 • Cash Drawer Solenoid", Icons.Default.Print),
+        SettingSectionRow("Cloud Sync & Outbox Queue", "WorkManager Background Push • LWW Conflict Resolver", Icons.Default.CloudSync),
+        SettingSectionRow("Offline Mode & Storage", "Room Offline Database • Auto-Sync Catchup", Icons.Default.SignalCellularOff),
+        SettingSectionRow("Notifications & Alerts", "Low Inventory Stock Warnings • Shift Summary Push", Icons.Default.Notifications),
+        SettingSectionRow("Security & Audit Logs", "Biometric Lock • Terminal Audit Tracking", Icons.Default.Security),
+        SettingSectionRow("Database Backup & Restore", "Export SQLite Room Database • Cloud Snapshot", Icons.Default.Backup),
+        SettingSectionRow("About Optix POS", "Version v1.0.0 (Build 9022) • Legal & Support", Icons.Default.Info)
     )
 
     Column(
@@ -46,17 +51,23 @@ fun SettingsScreen() {
         Text(
             text = "System Settings",
             color = OptixTextPrimary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            fontWeight = FontWeight.Black,
+            fontSize = 22.sp
+        )
+        Text(
+            text = "Configure terminal hardware, printers, tax & security",
+            color = OptixTextSecondary,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 2.dp)
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(settingsTiles) { tile ->
+            items(settingsRows) { row ->
                 OptixCard(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { }
@@ -69,28 +80,28 @@ fun SettingsScreen() {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(42.dp)
+                                    .size(44.dp)
                                     .clip(CircleShape)
                                     .background(OptixOrangeSubtle),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    imageVector = tile.icon,
+                                    imageVector = row.icon,
                                     contentDescription = null,
                                     tint = OptixOrange,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
                             Spacer(modifier = Modifier.width(14.dp))
                             Column {
                                 Text(
-                                    text = tile.title,
+                                    text = row.title,
                                     color = OptixTextPrimary,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 15.sp
                                 )
                                 Text(
-                                    text = tile.subtitle,
+                                    text = row.subtitle,
                                     color = OptixTextSecondary,
                                     fontSize = 12.sp
                                 )
@@ -99,7 +110,7 @@ fun SettingsScreen() {
 
                         Icon(
                             imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
+                            contentDescription = "Navigate",
                             tint = OptixTextSecondary,
                             modifier = Modifier.size(20.dp)
                         )
