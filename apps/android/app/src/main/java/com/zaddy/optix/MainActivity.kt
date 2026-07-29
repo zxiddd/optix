@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.zaddy.optix.auth.BusinessSetupScreen
 import com.zaddy.optix.auth.DeviceActivationScreen
 import com.zaddy.optix.auth.PinPadOverlay
 import com.zaddy.optix.ui.components.*
@@ -50,12 +51,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OptixMainAppNavigation() {
     var isDeviceActivated by remember { mutableStateOf(true) }
+    var isBusinessConfigured by remember { mutableStateOf(true) }
     var isStaffAuthenticated by remember { mutableStateOf(true) }
 
     when {
         !isDeviceActivated -> {
             DeviceActivationScreen(
-                onDeviceActivated = { isDeviceActivated = true }
+                onDeviceActivated = {
+                    isDeviceActivated = true
+                    isBusinessConfigured = false
+                }
+            )
+        }
+        !isBusinessConfigured -> {
+            BusinessSetupScreen(
+                onSetupComplete = {
+                    isBusinessConfigured = true
+                }
             )
         }
         !isStaffAuthenticated -> {
