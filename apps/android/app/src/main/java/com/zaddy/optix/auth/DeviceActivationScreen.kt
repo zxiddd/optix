@@ -1,6 +1,5 @@
 package com.zaddy.optix.auth
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -26,23 +26,21 @@ import androidx.compose.ui.unit.sp
 import com.zaddy.optix.ui.components.*
 import com.zaddy.optix.ui.theme.*
 
-enum class AuthMode {
-    LOGIN,
-    REGISTER
-}
-
-enum class LoginRoleTab {
+enum class DeviceAuthTab {
+    ACTIVATION_CODE,
     ADMIN_LOGIN,
-    STAFF_PIN
+    REGISTER
 }
 
 @Composable
 fun DeviceActivationScreen(
     onDeviceActivated: () -> Unit
 ) {
-    var authMode by remember { mutableStateOf(AuthMode.LOGIN) }
-    var loginRoleTab by remember { mutableStateOf(LoginRoleTab.ADMIN_LOGIN) }
+    var activeTab by remember { mutableStateOf(DeviceAuthTab.ACTIVATION_CODE) }
 
+    // Code Activation State
+    var activationCode by remember { mutableStateOf("OPTX-9022-8F3A") }
+    
     // Login Form State
     var email by remember { mutableStateOf("owner@metrocafe.com") }
     var password by remember { mutableStateOf("") }
@@ -50,12 +48,8 @@ fun DeviceActivationScreen(
 
     // Register Form State
     var regBusinessName by remember { mutableStateOf("") }
-    var regOwnerName by remember { mutableStateOf("") }
-    var regPhone by remember { mutableStateOf("") }
     var regEmail by remember { mutableStateOf("") }
     var regPassword by remember { mutableStateOf("") }
-    var regConfirmPassword by remember { mutableStateOf("") }
-    var isRegPasswordVisible by remember { mutableStateOf(false) }
 
     var isSubmitting by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -76,27 +70,27 @@ fun DeviceActivationScreen(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Bigger Optix Logo Badge
+            // Top Illustration Icon Badge
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(84.dp)
                     .clip(CircleShape)
-                    .background(OptixOrange),
+                    .background(OptixOrangeSubtle)
+                    .border(2.dp, OptixOrange, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "O",
-                    color = OptixTextPrimary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 44.sp
+                Icon(
+                    imageVector = Icons.Default.PointOfSale,
+                    contentDescription = null,
+                    tint = OptixOrange,
+                    modifier = Modifier.size(44.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Larger Heading
             Text(
-                text = if (authMode == AuthMode.LOGIN) "OPTIX BILLING" else "REGISTER BUSINESS",
+                text = "OPTIX TERMINAL",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 2.sp,
@@ -104,80 +98,88 @@ fun DeviceActivationScreen(
             )
 
             Text(
-                text = if (authMode == AuthMode.LOGIN)
-                    "Business Operating System Terminal Sign In"
-                else
-                    "Create a new multi-tenant Optix POS account",
+                text = "Activate register hardware or sign in to store account",
                 color = OptixTextSecondary,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Main Card Container with 22.dp Rounded Corners
+            // 3-Way Segmented Navigation Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(OptixSurface)
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                listOf(
+                    DeviceAuthTab.ACTIVATION_CODE to "Code",
+                    DeviceAuthTab.ADMIN_LOGIN to "Sign In",
+                    DeviceAuthTab.REGISTER to "Register"
+                ).forEach { (tab, title) ->
+                    val isSelected = activeTab == tab
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(if (isSelected) OptixOrange else Color.Transparent)
+                            .clickable {
+                                errorMessage = null
+                                activeTab = tab
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            color = OptixTextPrimary,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Main Dark Card Container
             OptixCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Crossfade(targetState = authMode, label = "authCrossfade") { mode ->
-                    if (mode == AuthMode.LOGIN) {
-                        Column {
-                            // Admin / Staff Segmented Control
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp)
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(OptixSurface)
-                                    .padding(4.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(20.dp))
-                                        .background(if (loginRoleTab == LoginRoleTab.ADMIN_LOGIN) OptixOrange else Color.Transparent)
-                                        .clickable { loginRoleTab = LoginRoleTab.ADMIN_LOGIN },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Admin Login",
-                                        color = OptixTextPrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp
-                                    )
-                                }
+                Crossfade(targetState = activeTab, label = "tabCrossfade") { tab ->
+                    when (tab) {
+                        DeviceAuthTab.ACTIVATION_CODE -> {
+                            Column {
+                                Text(
+                                    text = "Enter Device Activation Code",
+                                    color = OptixTextPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = "Enter code generated from your Optix Web Portal",
+                                    color = OptixTextSecondary,
+                                    fontSize = 12.sp
+                                )
 
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .clip(RoundedCornerShape(20.dp))
-                                        .background(if (loginRoleTab == LoginRoleTab.STAFF_PIN) OptixOrange else Color.Transparent)
-                                        .clickable { loginRoleTab = LoginRoleTab.STAFF_PIN },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Staff PIN",
-                                        color = OptixTextPrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp
-                                    )
-                                }
-                            }
+                                Spacer(modifier = Modifier.height(16.dp))
 
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            if (loginRoleTab == LoginRoleTab.ADMIN_LOGIN) {
-                                // Premium Email Field
+                                // Activation Code Input Field
                                 OutlinedTextField(
-                                    value = email,
-                                    onValueChange = { email = it },
-                                    label = { Text("Account Email", color = OptixTextSecondary) },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Email, contentDescription = null, tint = OptixOrange)
-                                    },
+                                    value = activationCode,
+                                    onValueChange = { activationCode = it.uppercase() },
+                                    label = { Text("Activation Code", color = OptixTextSecondary) },
+                                    leadingIcon = { Icon(Icons.Default.VpnKey, contentDescription = null, tint = OptixOrange) },
+                                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                        fontFamily = FontFamily.Monospace,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 2.sp,
+                                        color = OptixTextPrimary
+                                    ),
                                     shape = RoundedCornerShape(16.dp),
                                     modifier = Modifier.fillMaxWidth(),
                                     singleLine = true,
@@ -191,21 +193,106 @@ fun DeviceActivationScreen(
                                     )
                                 )
 
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // QR Code Scanner Button
+                                OptixButton(
+                                    text = "SCAN QR CODE",
+                                    onClick = { },
+                                    isSecondary = true,
+                                    icon = Icons.Default.QrCodeScanner
+                                )
+
+                                Spacer(modifier = Modifier.height(18.dp))
+
+                                // Device Hardware Information Card
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(OptixSurface)
+                                        .border(1.dp, OptixCardBorder, RoundedCornerShape(16.dp))
+                                        .padding(14.dp)
+                                ) {
+                                    Column {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Default.ImportantDevices, contentDescription = null, tint = OptixOrange, modifier = Modifier.size(18.dp))
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text("Hardware Diagnostics", color = OptixTextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text("Model", color = OptixTextSecondary, fontSize = 11.sp)
+                                            Text("Sunmi V2 Pro Terminal", color = OptixTextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text("Hardware ID", color = OptixTextSecondary, fontSize = 11.sp)
+                                            Text("DEV-9022-8F3A", color = OptixOrange, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                                        }
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text("Network IP", color = OptixTextSecondary, fontSize = 11.sp)
+                                            Text("192.168.1.105", color = OptixTextPrimary, fontSize = 11.sp)
+                                        }
+                                    }
+                                }
+
+                                errorMessage?.let {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Text(text = it, color = OptixErrorRed, fontSize = 12.sp)
+                                }
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                // Register Device Primary Orange Button
+                                OptixButton(
+                                    text = if (isSubmitting) "ACTIVATING DEVICE..." else "REGISTER & ACTIVATE DEVICE",
+                                    onClick = {
+                                        if (activationCode.isBlank()) {
+                                            errorMessage = "Activation Code is required."
+                                            return@OptixButton
+                                        }
+                                        isSubmitting = true
+                                        onDeviceActivated()
+                                    }
+                                )
+                            }
+                        }
+
+                        DeviceAuthTab.ADMIN_LOGIN -> {
+                            Column {
+                                Text(text = "Admin Account Sign In", color = OptixTextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                                 Spacer(modifier = Modifier.height(14.dp))
 
-                                // Premium Password Field with Eye Toggle
+                                OutlinedTextField(
+                                    value = email,
+                                    onValueChange = { email = it },
+                                    label = { Text("Account Email", color = OptixTextSecondary) },
+                                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = OptixOrange) },
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = OptixOrange,
+                                        unfocusedBorderColor = OptixCardBorder,
+                                        focusedTextColor = OptixTextPrimary,
+                                        unfocusedTextColor = OptixTextPrimary,
+                                        focusedContainerColor = OptixSurface,
+                                        unfocusedContainerColor = OptixSurface
+                                    )
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
                                 OutlinedTextField(
                                     value = password,
                                     onValueChange = { password = it },
                                     label = { Text("Password", color = OptixTextSecondary) },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Lock, contentDescription = null, tint = OptixOrange)
-                                    },
+                                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = OptixOrange) },
                                     trailingIcon = {
                                         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                                             Icon(
                                                 imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                                contentDescription = "Toggle Password Visibility",
+                                                contentDescription = null,
                                                 tint = OptixTextSecondary
                                             )
                                         }
@@ -224,271 +311,63 @@ fun DeviceActivationScreen(
                                     )
                                 )
 
-                                errorMessage?.let {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(text = it, color = OptixErrorRed, fontSize = 12.sp)
-                                }
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                OptixButton(
+                                    text = "SIGN IN & ACTIVATE",
+                                    onClick = onDeviceActivated
+                                )
+                            }
+                        }
+
+                        DeviceAuthTab.REGISTER -> {
+                            Column {
+                                Text(text = "Create Business Account", color = OptixTextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.height(14.dp))
+
+                                OutlinedTextField(
+                                    value = regBusinessName,
+                                    onValueChange = { regBusinessName = it },
+                                    label = { Text("Business Name", color = OptixTextSecondary) },
+                                    leadingIcon = { Icon(Icons.Default.Store, contentDescription = null, tint = OptixOrange) },
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = OptixOrange,
+                                        unfocusedBorderColor = OptixCardBorder,
+                                        focusedTextColor = OptixTextPrimary,
+                                        unfocusedTextColor = OptixTextPrimary,
+                                        focusedContainerColor = OptixSurface,
+                                        unfocusedContainerColor = OptixSurface
+                                    )
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                OutlinedTextField(
+                                    value = regEmail,
+                                    onValueChange = { regEmail = it },
+                                    label = { Text("Email Address", color = OptixTextSecondary) },
+                                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = OptixOrange) },
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = OptixOrange,
+                                        unfocusedBorderColor = OptixCardBorder,
+                                        focusedTextColor = OptixTextPrimary,
+                                        unfocusedTextColor = OptixTextPrimary,
+                                        focusedContainerColor = OptixSurface,
+                                        unfocusedContainerColor = OptixSurface
+                                    )
+                                )
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                // Primary Action Sign In Button
                                 OptixButton(
-                                    text = if (isSubmitting) "ACTIVATING..." else "SIGN IN & ACTIVATE",
-                                    onClick = {
-                                        if (email.isBlank()) {
-                                            errorMessage = "Email is required."
-                                            return@OptixButton
-                                        }
-                                        isSubmitting = true
-                                        onDeviceActivated()
-                                    }
-                                )
-
-                                Spacer(modifier = Modifier.height(14.dp))
-
-                                // Google Sign In Button
-                                Button(
-                                    onClick = { onDeviceActivated() },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(52.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = OptixSurface,
-                                        contentColor = OptixTextPrimary
-                                    )
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.AccountCircle,
-                                            contentDescription = "Google",
-                                            tint = OptixTextPrimary,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(10.dp))
-                                        Text(text = "Sign in with Google", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                // Register Link
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Text(text = "Don't have an account? ", color = OptixTextSecondary, fontSize = 13.sp)
-                                    Text(
-                                        text = "Register Business",
-                                        color = OptixOrange,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                        modifier = Modifier.clickable {
-                                            errorMessage = null
-                                            authMode = AuthMode.REGISTER
-                                        }
-                                    )
-                                }
-                            } else {
-                                // Staff PIN Quick Unlock Instructions
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(
-                                        imageVector = Icons.Default.Pin,
-                                        contentDescription = null,
-                                        tint = OptixOrange,
-                                        modifier = Modifier.size(48.dp)
-                                    )
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Text(
-                                        text = "Staff Quick PIN Unlock",
-                                        color = OptixTextPrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
-                                    )
-                                    Spacer(modifier = Modifier.height(6.dp))
-                                    Text(
-                                        text = "Terminal already registered. Use PIN Pad to sign in as cashier.",
-                                        color = OptixTextSecondary,
-                                        fontSize = 12.sp
-                                    )
-                                    Spacer(modifier = Modifier.height(20.dp))
-                                    OptixButton(
-                                        text = "OPEN PIN PAD",
-                                        onClick = onDeviceActivated
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        // Registration Form View
-                        Column {
-                            OutlinedTextField(
-                                value = regBusinessName,
-                                onValueChange = { regBusinessName = it },
-                                label = { Text("Business Name", color = OptixTextSecondary) },
-                                leadingIcon = { Icon(Icons.Default.Store, contentDescription = null, tint = OptixOrange) },
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = OptixOrange,
-                                    unfocusedBorderColor = OptixCardBorder,
-                                    focusedTextColor = OptixTextPrimary,
-                                    unfocusedTextColor = OptixTextPrimary,
-                                    focusedContainerColor = OptixSurface,
-                                    unfocusedContainerColor = OptixSurface
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            OutlinedTextField(
-                                value = regOwnerName,
-                                onValueChange = { regOwnerName = it },
-                                label = { Text("Owner Name", color = OptixTextSecondary) },
-                                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = OptixOrange) },
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = OptixOrange,
-                                    unfocusedBorderColor = OptixCardBorder,
-                                    focusedTextColor = OptixTextPrimary,
-                                    unfocusedTextColor = OptixTextPrimary,
-                                    focusedContainerColor = OptixSurface,
-                                    unfocusedContainerColor = OptixSurface
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            OutlinedTextField(
-                                value = regPhone,
-                                onValueChange = { regPhone = it },
-                                label = { Text("Phone Number", color = OptixTextSecondary) },
-                                leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null, tint = OptixOrange) },
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = OptixOrange,
-                                    unfocusedBorderColor = OptixCardBorder,
-                                    focusedTextColor = OptixTextPrimary,
-                                    unfocusedTextColor = OptixTextPrimary,
-                                    focusedContainerColor = OptixSurface,
-                                    unfocusedContainerColor = OptixSurface
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            OutlinedTextField(
-                                value = regEmail,
-                                onValueChange = { regEmail = it },
-                                label = { Text("Email Address", color = OptixTextSecondary) },
-                                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = OptixOrange) },
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = OptixOrange,
-                                    unfocusedBorderColor = OptixCardBorder,
-                                    focusedTextColor = OptixTextPrimary,
-                                    unfocusedTextColor = OptixTextPrimary,
-                                    focusedContainerColor = OptixSurface,
-                                    unfocusedContainerColor = OptixSurface
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            OutlinedTextField(
-                                value = regPassword,
-                                onValueChange = { regPassword = it },
-                                label = { Text("Password", color = OptixTextSecondary) },
-                                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = OptixOrange) },
-                                trailingIcon = {
-                                    IconButton(onClick = { isRegPasswordVisible = !isRegPasswordVisible }) {
-                                        Icon(
-                                            imageVector = if (isRegPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                            contentDescription = "Toggle Password Visibility",
-                                            tint = OptixTextSecondary
-                                        )
-                                    }
-                                },
-                                visualTransformation = if (isRegPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = OptixOrange,
-                                    unfocusedBorderColor = OptixCardBorder,
-                                    focusedTextColor = OptixTextPrimary,
-                                    unfocusedTextColor = OptixTextPrimary,
-                                    focusedContainerColor = OptixSurface,
-                                    unfocusedContainerColor = OptixSurface
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            OutlinedTextField(
-                                value = regConfirmPassword,
-                                onValueChange = { regConfirmPassword = it },
-                                label = { Text("Confirm Password", color = OptixTextSecondary) },
-                                leadingIcon = { Icon(Icons.Default.LockReset, contentDescription = null, tint = OptixOrange) },
-                                visualTransformation = PasswordVisualTransformation(),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = OptixOrange,
-                                    unfocusedBorderColor = OptixCardBorder,
-                                    focusedTextColor = OptixTextPrimary,
-                                    unfocusedTextColor = OptixTextPrimary,
-                                    focusedContainerColor = OptixSurface,
-                                    unfocusedContainerColor = OptixSurface
-                                )
-                            )
-
-                            errorMessage?.let {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(text = it, color = OptixErrorRed, fontSize = 12.sp)
-                            }
-
-                            Spacer(modifier = Modifier.height(20.dp))
-
-                            OptixButton(
-                                text = "REGISTER & CONTINUE",
-                                onClick = {
-                                    if (regBusinessName.isBlank() || regEmail.isBlank()) {
-                                        errorMessage = "Business Name and Email are required."
-                                        return@OptixButton
-                                    }
-                                    if (regPassword != regConfirmPassword) {
-                                        errorMessage = "Passwords do not match."
-                                        return@OptixButton
-                                    }
-                                    onDeviceActivated()
-                                }
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(text = "Already have an account? ", color = OptixTextSecondary, fontSize = 13.sp)
-                                Text(
-                                    text = "Back to Sign In",
-                                    color = OptixOrange,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    modifier = Modifier.clickable {
-                                        errorMessage = null
-                                        authMode = AuthMode.LOGIN
-                                    }
+                                    text = "REGISTER BUSINESS",
+                                    onClick = onDeviceActivated
                                 )
                             }
                         }
