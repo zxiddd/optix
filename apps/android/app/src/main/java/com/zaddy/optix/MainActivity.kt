@@ -3,7 +3,8 @@ package com.zaddy.optix
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,7 +26,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = OptixDarkBackground
                 ) {
-                    OptixMainAppNavigation()
+                    var showSplash by remember { mutableStateOf(true) }
+
+                    Crossfade(
+                        targetState = showSplash,
+                        animationSpec = tween(durationMillis = 500),
+                        label = "splashFade"
+                    ) { isSplash ->
+                        if (isSplash) {
+                            SplashScreen(
+                                onSplashFinished = { showSplash = false }
+                            )
+                        } else {
+                            OptixMainAppNavigation()
+                        }
+                    }
                 }
             }
         }

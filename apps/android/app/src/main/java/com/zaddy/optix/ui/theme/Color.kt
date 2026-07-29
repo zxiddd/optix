@@ -2,20 +2,20 @@ package com.zaddy.optix.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Optix Design System Color Palette (Official Dark & Electric Orange Reference)
-val OptixDarkBackground = Color(0xFF0F0F12)
-val OptixSurface = Color(0xFF18181C)
-val OptixCardBg = Color(0xFF222228)
-val OptixCardBorder = Color(0xFF2C2C34)
+// Optix Design System Tokens (Official Dark Charcoal #111111 & Orange #FF6B00 Visual Identity)
+val OptixDarkBackground = Color(0xFF111111)
+val OptixSurface = Color(0xFF181818)
+val OptixCardBg = Color(0xFF1F1F1F)
+val OptixCardBorder = Color(0xFF2A2A2A)
 
-val OptixOrange = Color(0xFFFF5500)
-val OptixOrangeDark = Color(0xFFCC4400)
-val OptixOrangeLight = Color(0xFFFF7733)
-val OptixOrangeSubtle = Color(0x33FF5500)
+val OptixOrange = Color(0xFFFF6B00)
+val OptixOrangeDark = Color(0xD65900)
+val OptixOrangeLight = Color(0xFFFF8533)
+val OptixOrangeSubtle = Color(0x33FF6B00)
 
 val OptixTextPrimary = Color(0xFFFFFFFF)
-val OptixTextSecondary = Color(0xFF9E9EA8)
-val OptixTextMuted = Color(0xFF62626E)
+val OptixTextSecondary = Color(0xFF9A9A9A)
+val OptixTextMuted = Color(0xFF5A5A5A)
 
 val OptixSuccessGreen = Color(0xFF22C55E)
 val OptixErrorRed = Color(0xFFEF4444)

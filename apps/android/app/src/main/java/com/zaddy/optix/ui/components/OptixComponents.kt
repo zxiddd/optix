@@ -32,11 +32,11 @@ fun OptixCard(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(22.dp))
             .background(backgroundColor)
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(22.dp))
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .padding(16.dp)
+            .padding(18.dp)
     ) {
         Column { content() }
     }
@@ -53,14 +53,14 @@ fun OptixButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(52.dp)
+            .height(56.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSecondary) OptixCardBg else OptixOrange,
             contentColor = OptixTextPrimary
         ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -71,9 +71,9 @@ fun OptixButton(
                     imageVector = icon,
                     contentDescription = null,
                     tint = OptixTextPrimary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(22.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(10.dp))
             }
             Text(
                 text = text,
@@ -97,7 +97,7 @@ fun OptixChip(
             .background(if (isSelected) OptixOrange else OptixCardBg)
             .border(1.dp, if (isSelected) OptixOrange else OptixCardBorder, RoundedCornerShape(24.dp))
             .clickable { onClick() }
-            .padding(horizontal = 18.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -119,11 +119,11 @@ fun OptixSearchBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .clip(RoundedCornerShape(14.dp))
+            .height(52.dp)
+            .clip(RoundedCornerShape(20.dp))
             .background(OptixCardBg)
-            .border(1.dp, OptixCardBorder, RoundedCornerShape(14.dp))
-            .padding(horizontal = 14.dp),
+            .border(1.dp, OptixCardBorder, RoundedCornerShape(20.dp))
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -132,7 +132,7 @@ fun OptixSearchBar(
             tint = OptixTextSecondary,
             modifier = Modifier.size(20.dp)
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         BasicTextField(
             value = query,
             onValueChange = onQueryChange,
@@ -174,7 +174,7 @@ fun OptixBottomNavigation(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 12.dp),
+                .padding(vertical = 10.dp, horizontal = 12.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -182,10 +182,10 @@ fun OptixBottomNavigation(
                 val isSelected = tab == selectedTab
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(22.dp))
                         .background(if (isSelected) OptixOrange else Color.Transparent)
                         .clickable { onTabSelected(tab) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -225,14 +225,14 @@ fun OptixTopAppBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(38.dp)
                         .clip(CircleShape)
                         .background(OptixOrange),
                     contentAlignment = Alignment.Center
@@ -294,7 +294,7 @@ fun OptixStatCard(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(46.dp)
                     .clip(CircleShape)
                     .background(if (isHighlight) Color.White.copy(alpha = 0.2f) else OptixOrangeSubtle),
                 contentAlignment = Alignment.Center
@@ -345,7 +345,7 @@ fun OptixProductCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(OptixSurface),
             contentAlignment = Alignment.Center
         ) {
@@ -384,7 +384,7 @@ fun OptixProductCard(
             )
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(34.dp)
                     .clip(CircleShape)
                     .background(OptixOrange)
                     .clickable { onAddToCart() },
@@ -423,7 +423,7 @@ fun OptixOrderCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(42.dp)
                         .clip(CircleShape)
                         .background(OptixOrangeSubtle),
                     contentAlignment = Alignment.Center
@@ -460,7 +460,7 @@ fun OptixOrderCard(
                 )
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(OptixSuccessGreen.copy(alpha = 0.2f))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
