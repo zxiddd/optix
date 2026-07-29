@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.zaddy.optix.auth.BusinessSetupScreen
 import com.zaddy.optix.auth.DeviceActivationScreen
 import com.zaddy.optix.auth.PinPadOverlay
+import com.zaddy.optix.auth.SubscriptionPlanScreen
 import com.zaddy.optix.ui.components.*
 import com.zaddy.optix.ui.screens.*
 import com.zaddy.optix.ui.theme.*
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
 fun OptixMainAppNavigation() {
     var isDeviceActivated by remember { mutableStateOf(true) }
     var isBusinessConfigured by remember { mutableStateOf(true) }
+    var isSubscriptionSelected by remember { mutableStateOf(true) }
     var isStaffAuthenticated by remember { mutableStateOf(true) }
 
     when {
@@ -67,6 +69,14 @@ fun OptixMainAppNavigation() {
             BusinessSetupScreen(
                 onSetupComplete = {
                     isBusinessConfigured = true
+                    isSubscriptionSelected = false
+                }
+            )
+        }
+        !isSubscriptionSelected -> {
+            SubscriptionPlanScreen(
+                onPlanSelected = {
+                    isSubscriptionSelected = true
                 }
             )
         }
