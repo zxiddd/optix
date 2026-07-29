@@ -1,31 +1,43 @@
 package com.zaddy.optix.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaddy.optix.ui.components.*
 import com.zaddy.optix.ui.theme.*
 
-data class CartItemUI(
+data class RegisterProductUI(
     val id: String,
     val title: String,
-    val unitPrice: Double,
+    val price: Double,
+    val stockCount: Int,
+    val category: String
+)
+
+data class RegisterCartItemUI(
+    val product: RegisterProductUI,
     var quantity: Int
 )
 
@@ -33,203 +45,293 @@ data class CartItemUI(
 fun BillingScreen(
     onCheckoutSuccess: () -> Unit = {}
 ) {
-    var selectedOrderType by remember { mutableStateOf("Dine-In (Table 1)") }
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
     var selectedTenderMethod by remember { mutableStateOf("CASH") }
-    val cartItems = remember {
-        mutableStateListOf(
-            CartItemUI("1", "Classic Butter Croissant", 4.50, 2),
-            CartItemUI("2", "Espresso Cappuccino Large", 5.00, 1),
-            CartItemUI("3", "Blueberry Muffin Batch", 3.50, 3)
+    var discountPercent by remember { mutableStateOf(0) }
+    var tokenNumber by remember { mutableStateOf(42) }
+
+    val products = remember {
+        listOf(
+            RegisterProductUI("1", "Butter Croissant", 4.50, 42, "Bakery"),
+            RegisterProductUI("2", "Cappuccino Large", 5.00, 100, "Beverages"),
+            RegisterProductUI("3", "Blueberry Muffin", 3.50, 25, "Bakery"),
+            RegisterProductUI("4", "Iced Vanilla Latte", 5.50, 80, "Beverages"),
+            RegisterProductUI("5", "Avocado Toast", 8.50, 15, "Meals"),
+            RegisterProductUI("6", "Chocolate Lava Cake", 6.00, 20, "Desserts")
         )
     }
 
-    val subtotal = cartItems.sumOf { it.unitPrice * it.quantity }
-    val taxTotal = subtotal * 0.10
-    val grandTotal = subtotal + taxTotal
+    val cartItems = remember { mutableStateListOf<RegisterCartItemUI>() }
+
+    fun addProductToCart(product: RegisterProductUI) {
+        val existing = cartItems.find { it.product.id == product.id }
+        if (existing != null) {
+            existing.quantity++
+        } else {
+            cartItems.add(RegisterCartItemUI(product, 1))
+        }
+    }
+
+    val subtotal = cartItems.sumOf { it.product.price * it.quantity }
+    val discountAmount = subtotal * (discountPercent / 100.0)
+    val taxableSubtotal = Math.max(0.0, subtotal - discountAmount)
+    val taxTotal = taxableSubtotal * 0.10
+    val grandTotal = taxableSubtotal + taxTotal
+
+    val filteredProducts = products.filter {
+        (selectedCategory == "All" || it.category == selectedCategory) &&
+        (searchQuery.isEmpty() || it.title.contains(searchQuery, ignoreCase = true))
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(OptixDarkBackground)
-            .padding(16.dp)
+            .padding(14.dp)
     ) {
-        // Mode Selector Chips
+        // Top Bar: Business Name, Token Number, Search Bar, Categories
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            OptixChip(
-                text = "Dine-In (Table 1)",
-                isSelected = selectedOrderType == "Dine-In (Table 1)",
-                onClick = { selectedOrderType = "Dine-In (Table 1)" }
-            )
-            OptixChip(
-                text = "Takeaway",
-                isSelected = selectedOrderType == "Takeaway",
-                onClick = { selectedOrderType = "Takeaway" }
-            )
-            OptixChip(
-                text = "Delivery",
-                isSelected = selectedOrderType == "Delivery",
-                onClick = { selectedOrderType = "Delivery" }
-            )
+            Column {
+                Text("Metro Cafe & Bakery", color = OptixTextPrimary, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                Text("Fast Billing Register • SLA <50ms", color = OptixTextSecondary, fontSize = 12.sp)
+            }
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(OptixOrangeSubtle)
+                    .border(1.dp, OptixOrange, RoundedCornerShape(14.dp))
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = "TOKEN #${String.format("%03d", tokenNumber)}",
+                    color = OptixOrange,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // Active Cart Items List
-        Text(
-            text = "Active Order Items (${cartItems.sumOf { it.quantity }})",
-            color = OptixTextSecondary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
+        // Search Bar & Categories
+        OptixSearchBar(
+            query = searchQuery,
+            onQueryChange = { searchQuery = it },
+            placeholderText = "Search products, SKU or barcode..."
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            items(cartItems) { item ->
-                OptixCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+            listOf("All", "Bakery", "Beverages", "Meals", "Desserts").forEach { category ->
+                OptixChip(
+                    text = category,
+                    isSelected = selectedCategory == category,
+                    onClick = { selectedCategory = category }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Split Layout: Top Product Grid (45%) & Bottom Current Bill Card (55%)
+        Column(modifier = Modifier.weight(1f)) {
+            // Product Catalog Grid
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(0.9f)
+            ) {
+                items(filteredProducts) { item ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(OptixCardBg)
+                            .border(1.dp, OptixCardBorder, RoundedCornerShape(16.dp))
+                            .clickable { addProductToCart(item) }
+                            .padding(10.dp)
+                    ) {
+                        Column {
+                            Text(item.title, color = OptixTextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp, maxLines = 1)
+                            Text("$${String.format("%.2f", item.price)}", color = OptixOrange, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Current Bill Card (Bottom Half)
+            OptixCard(
+                modifier = Modifier.weight(1.1f)
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "CURRENT BILL (${cartItems.sumOf { it.quantity }} items)",
+                            color = OptixTextPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+
+                        // Quick Action Buttons: Clear
+                        if (cartItems.isNotEmpty()) {
                             Text(
-                                text = item.title,
-                                color = OptixTextPrimary,
+                                text = "CLEAR ALL",
+                                color = OptixErrorRed,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
-                            Text(
-                                text = "$${String.format("%.2f", item.unitPrice)} each",
-                                color = OptixTextSecondary,
-                                fontSize = 12.sp
+                                fontSize = 11.sp,
+                                modifier = Modifier.clickable { cartItems.clear() }
                             )
                         }
+                    }
 
-                        // Quantity Control Controls
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Active Cart Items List
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        items(cartItems, key = { it.product.id }) { cartItem ->
+                            Row(
                                 modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
                                     .background(OptixSurface)
-                                    .clickable {
-                                        if (item.quantity > 1) {
-                                            item.quantity--
-                                        } else {
-                                            cartItems.remove(item)
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = if (item.quantity > 1) Icons.Default.Remove else Icons.Default.Delete,
-                                    contentDescription = "Decrease",
-                                    tint = OptixErrorRed,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(cartItem.product.title, color = OptixTextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                    Text("$${String.format("%.2f", cartItem.product.price * cartItem.quantity)}", color = OptixOrange, fontSize = 12.sp)
+                                }
 
-                            Text(
-                                text = "${item.quantity}",
-                                color = OptixTextPrimary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(horizontal = 12.dp)
-                            )
+                                // Quantity Controls (+/- & Delete)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(28.dp)
+                                            .clip(CircleShape)
+                                            .background(OptixCardBg)
+                                            .clickable {
+                                                if (cartItem.quantity > 1) {
+                                                    cartItem.quantity--
+                                                } else {
+                                                    cartItems.remove(cartItem)
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = if (cartItem.quantity > 1) Icons.Default.Remove else Icons.Default.Delete,
+                                            contentDescription = "Decrease",
+                                            tint = OptixErrorRed,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                    }
 
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(OptixOrange)
-                                    .clickable { item.quantity++ },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Increase",
-                                    tint = OptixTextPrimary,
-                                    modifier = Modifier.size(16.dp)
-                                )
+                                    Text(
+                                        text = "${cartItem.quantity}",
+                                        color = OptixTextPrimary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.padding(horizontal = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(28.dp)
+                                            .clip(CircleShape)
+                                            .background(OptixOrange)
+                                            .clickable { cartItem.quantity++ },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Default.Add, contentDescription = "Increase", tint = OptixTextPrimary, modifier = Modifier.size(14.dp))
+                                    }
+                                }
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Totals Breakdown: Subtotal, Discount, Tax, Grand Total
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Subtotal", color = OptixTextSecondary, fontSize = 12.sp)
+                        Text("$${String.format("%.2f", subtotal)}", color = OptixTextPrimary, fontSize = 12.sp)
+                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Tax GST (10%)", color = OptixTextSecondary, fontSize = 12.sp)
+                        Text("+$${String.format("%.2f", taxTotal)}", color = OptixTextPrimary, fontSize = 12.sp)
+                    }
+
+                    Divider(color = OptixCardBorder, modifier = Modifier.padding(vertical = 6.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("GRAND TOTAL", color = OptixTextPrimary, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                        Text(
+                            "$${String.format("%.2f", grandTotal)}",
+                            color = OptixOrange,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 22.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Tender Method Selectors: Cash, UPI, Card, Split
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf("CASH", "UPI", "CARD", "SPLIT").forEach { tender ->
+                            OptixChip(
+                                text = tender,
+                                isSelected = selectedTenderMethod == tender,
+                                onClick = { selectedTenderMethod = tender },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Floating Checkout Animation Action Button
+                    OptixButton(
+                        text = if (cartItems.isEmpty()) "SELECT ITEMS TO CHARGE" else "CHARGE • $${String.format("%.2f", grandTotal)}",
+                        onClick = {
+                            if (cartItems.isNotEmpty()) {
+                                tokenNumber++
+                                cartItems.clear()
+                                onCheckoutSuccess()
+                            }
+                        }
+                    )
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Live Total Card
-        OptixCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = OptixSurface
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Subtotal", color = OptixTextSecondary, fontSize = 14.sp)
-                Text("$${String.format("%.2f", subtotal)}", color = OptixTextPrimary, fontSize = 14.sp)
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("GST Tax (10%)", color = OptixTextSecondary, fontSize = 14.sp)
-                Text("$${String.format("%.2f", taxTotal)}", color = OptixTextPrimary, fontSize = 14.sp)
-            }
-            Divider(color = OptixCardBorder, modifier = Modifier.padding(vertical = 8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Grand Total", color = OptixTextPrimary, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text(
-                    "$${String.format("%.2f", grandTotal)}",
-                    color = OptixOrange,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Tender Selection
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf("CASH", "UPI", "CARD").forEach { tender ->
-                OptixChip(
-                    text = tender,
-                    isSelected = selectedTenderMethod == tender,
-                    onClick = { selectedTenderMethod = tender },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Action Orange Checkout Button
-        OptixButton(
-            text = "COMPLETE CHECKOUT • $${String.format("%.2f", grandTotal)}",
-            onClick = onCheckoutSuccess
-        )
     }
 }
