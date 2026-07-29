@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaddy.optix.hardware.PrinterSetupScreen
+import com.zaddy.optix.staff.StaffManagementScreen
 import com.zaddy.optix.ui.components.*
 import com.zaddy.optix.ui.theme.*
 
@@ -31,102 +32,110 @@ data class SettingSectionRow(
 fun SettingsScreen() {
     var activeSubScreen by remember { mutableStateOf<String?>(null) }
 
-    if (activeSubScreen == "printers") {
-        PrinterSetupScreen(
-            onBack = { activeSubScreen = null }
-        )
-    } else {
-        val settingsRows = listOf(
-            SettingSectionRow("Business Information", "Metro Cafe & Bakery • Outlet #9022", Icons.Default.Store),
-            SettingSectionRow("Payment Accounts & Tender", "Static UPI QR Code • PineLabs Card Terminal", Icons.Default.QrCodeScanner),
-            SettingSectionRow("Subscription & Licensing", "PRO POS Tier • 7-Day Offline Grace Active", Icons.Default.WorkspacePremium),
-            SettingSectionRow("Receipt Header & Footer", "Thermal Paper Preview • Custom Business Logo", Icons.Default.ReceiptLong),
-            SettingSectionRow("Staff & RBAC Permissions", "7 Active Staff Roles • Manager Security PIN", Icons.Default.People),
-            SettingSectionRow("ESC/POS Thermal Printers", "Network TCP 192.168.1.100 • Cash Drawer Solenoid", Icons.Default.Print, routeKey = "printers"),
-            SettingSectionRow("Cloud Sync & Outbox Queue", "WorkManager Background Push • LWW Conflict Resolver", Icons.Default.CloudSync),
-            SettingSectionRow("Offline Mode & Storage", "Room Offline Database • Auto-Sync Catchup", Icons.Default.SignalCellularOff),
-            SettingSectionRow("Notifications & Alerts", "Low Inventory Stock Warnings • Shift Summary Push", Icons.Default.Notifications),
-            SettingSectionRow("Security & Audit Logs", "Biometric Lock • Terminal Audit Tracking", Icons.Default.Security),
-            SettingSectionRow("Database Backup & Restore", "Export SQLite Room Database • Cloud Snapshot", Icons.Default.Backup),
-            SettingSectionRow("About Optix POS", "Version v1.0.0 (Build 9022) • Legal & Support", Icons.Default.Info)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(OptixDarkBackground)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "System Settings",
-                color = OptixTextPrimary,
-                fontWeight = FontWeight.Black,
-                fontSize = 22.sp
+    when (activeSubScreen) {
+        "printers" -> {
+            PrinterSetupScreen(
+                onBack = { activeSubScreen = null }
             )
-            Text(
-                text = "Configure terminal hardware, printers, tax & security",
-                color = OptixTextSecondary,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 2.dp)
+        }
+        "staff" -> {
+            StaffManagementScreen(
+                onBack = { activeSubScreen = null }
+            )
+        }
+        else -> {
+            val settingsRows = listOf(
+                SettingSectionRow("Business Information", "Metro Cafe & Bakery • Outlet #9022", Icons.Default.Store),
+                SettingSectionRow("Payment Accounts & Tender", "Static UPI QR Code • PineLabs Card Terminal", Icons.Default.QrCodeScanner),
+                SettingSectionRow("Subscription & Licensing", "PRO POS Tier • 7-Day Offline Grace Active", Icons.Default.WorkspacePremium),
+                SettingSectionRow("Receipt Header & Footer", "Thermal Paper Preview • Custom Business Logo", Icons.Default.ReceiptLong),
+                SettingSectionRow("Staff & RBAC Permissions", "7 Active Staff Roles • Manager Security PIN", Icons.Default.People, routeKey = "staff"),
+                SettingSectionRow("ESC/POS Thermal Printers", "Network TCP 192.168.1.100 • Cash Drawer Solenoid", Icons.Default.Print, routeKey = "printers"),
+                SettingSectionRow("Cloud Sync & Outbox Queue", "WorkManager Background Push • LWW Conflict Resolver", Icons.Default.CloudSync),
+                SettingSectionRow("Offline Mode & Storage", "Room Offline Database • Auto-Sync Catchup", Icons.Default.SignalCellularOff),
+                SettingSectionRow("Notifications & Alerts", "Low Inventory Stock Warnings • Shift Summary Push", Icons.Default.Notifications),
+                SettingSectionRow("Security & Audit Logs", "Biometric Lock • Terminal Audit Tracking", Icons.Default.Security),
+                SettingSectionRow("Database Backup & Restore", "Export SQLite Room Database • Cloud Snapshot", Icons.Default.Backup),
+                SettingSectionRow("About Optix POS", "Version v1.0.0 (Build 9022) • Legal & Support", Icons.Default.Info)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(OptixDarkBackground)
+                    .padding(16.dp)
             ) {
-                items(settingsRows) { row ->
-                    OptixCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            if (row.routeKey != null) {
-                                activeSubScreen = row.routeKey
-                            }
-                        }
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(44.dp)
-                                        .clip(CircleShape)
-                                        .background(OptixOrangeSubtle),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = row.icon,
-                                        contentDescription = null,
-                                        tint = OptixOrange,
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(14.dp))
-                                Column {
-                                    Text(
-                                        text = row.title,
-                                        color = OptixTextPrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
-                                    )
-                                    Text(
-                                        text = row.subtitle,
-                                        color = OptixTextSecondary,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
+                Text(
+                    text = "System Settings",
+                    color = OptixTextPrimary,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 22.sp
+                )
+                Text(
+                    text = "Configure terminal hardware, printers, tax & security",
+                    color = OptixTextSecondary,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
 
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = "Navigate",
-                                tint = OptixTextSecondary,
-                                modifier = Modifier.size(20.dp)
-                            )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(settingsRows) { row ->
+                        OptixCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                if (row.routeKey != null) {
+                                    activeSubScreen = row.routeKey
+                                }
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(44.dp)
+                                            .clip(CircleShape)
+                                            .background(OptixOrangeSubtle),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = row.icon,
+                                            contentDescription = null,
+                                            tint = OptixOrange,
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(14.dp))
+                                    Column {
+                                        Text(
+                                            text = row.title,
+                                            color = OptixTextPrimary,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp
+                                        )
+                                        Text(
+                                            text = row.subtitle,
+                                            color = OptixTextSecondary,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+
+                                Icon(
+                                    imageVector = Icons.Default.ChevronRight,
+                                    contentDescription = "Navigate",
+                                    tint = OptixTextSecondary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
                 }
